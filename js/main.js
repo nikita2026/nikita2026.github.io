@@ -82,6 +82,11 @@ const observer = new IntersectionObserver((entries) => {
         if (entry.isIntersecting) {
             entry.target.classList.add('animate-in');
             
+            // Trigger stagger animations for timeline
+            if (entry.target.classList.contains('stagger-animation')) {
+                entry.target.classList.add('trigger-stagger');
+            }
+            
             // Animate counters
             if (entry.target.classList.contains('stat-number')) {
                 const target = parseInt(entry.target.getAttribute('data-target'));
@@ -107,6 +112,28 @@ document.addEventListener('DOMContentLoaded', () => {
     elementsToAnimate.forEach(el => {
         el.classList.add('animate-on-scroll');
         observer.observe(el);
+    });
+    
+    // Observe stagger animation containers and trigger immediately if in view
+    document.querySelectorAll('.stagger-animation').forEach(el => {
+        observer.observe(el);
+        
+        // Check if element is in experience-section (trigger on load)
+        const isExperienceSection = el.closest('.experience-section');
+        
+        if (isExperienceSection) {
+            // Check if element is already in viewport on page load
+            const rect = el.getBoundingClientRect();
+            const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
+            
+            if (isInViewport) {
+                // Trigger animation immediately for experience page elements in view on load
+                setTimeout(() => {
+                    el.classList.add('trigger-stagger');
+                }, 100);
+            }
+        }
+        // For timeline-section (About page), only trigger on scroll via observer
     });
     
     // Observe stat numbers
@@ -202,50 +229,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Mouse trail effect
-let mouseTrail = [];
-const maxTrailLength = 20;
-
-document.addEventListener('mousemove', (e) => {
-    mouseTrail.push({ x: e.clientX, y: e.clientY });
-    
-    if (mouseTrail.length > maxTrailLength) {
-        mouseTrail.shift();
-    }
-    
-    updateMouseTrail();
-});
-
-function updateMouseTrail() {
-    // Remove existing trail elements
-    document.querySelectorAll('.mouse-trail').forEach(el => el.remove());
-    
-    mouseTrail.forEach((point, index) => {
-        const trail = document.createElement('div');
-        trail.className = 'mouse-trail';
-        trail.style.cssText = `
-            position: fixed;
-            left: ${point.x}px;
-            top: ${point.y}px;
-            width: ${10 - (index * 0.3)}px;
-            height: ${10 - (index * 0.3)}px;
-            background: radial-gradient(circle, rgba(108, 92, 231, ${1 - (index * 0.05)}), transparent);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9999;
-            transform: translate(-50%, -50%);
-        `;
-        document.body.appendChild(trail);
-        
-        // Remove trail element after animation
-        setTimeout(() => {
-            if (trail.parentNode) {
-                trail.parentNode.removeChild(trail);
-            }
-        }, 1000);
-    });
-}
-
 // Parallax effect for hero section
 window.addEventListener('scroll', () => {
     const scrolled = window.pageYOffset;
@@ -332,3 +315,69 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// Contact Form Handler
+const contactForm = document.getElementById('contact-form');
+const formStatus = document.getElementById('form-status');
+
+if (contactForm) {
+    contactForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            subject: document.getElementById('subject').value,
+            message: document.getElementById('message').value
+        };
+        
+        // Show loading state
+        const submitBtn = contactForm.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+        submitBtn.disabled = true;
+        
+        try {
+            // Use EmailJS or Web3Forms API
+            const response = await fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    access_key: '4e8c9d5a-6b2f-4a3c-9d1e-7f8a9b0c1d2e', // Replace with your Web3Forms access key
+                    name: formData.name,
+                    email: formData.email,
+                    subject: formData.subject,
+                    message: formData.message,
+                    to: 'nikitabaxi1102@gmail.com'
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                formStatus.style.display = 'block';
+                formStatus.style.backgroundColor = '#d4edda';
+                formStatus.style.color = '#155724';
+                formStatus.textContent = 'Thank you! Your message has been sent successfully.';
+                contactForm.reset();
+            } else {
+                throw new Error('Form submission failed');
+            }
+        } catch (error) {
+            formStatus.style.display = 'block';
+            formStatus.style.backgroundColor = '#f8d7da';
+            formStatus.style.color = '#721c24';
+            formStatus.textContent = 'Oops! Something went wrong. Please try again or email me directly at nikitabaxi1102@gmail.com';
+        } finally {
+            submitBtn.innerHTML = originalBtnText;
+            submitBtn.disabled = false;
+            
+            // Hide status message after 5 seconds
+            setTimeout(() => {
+                formStatus.style.display = 'none';
+            }, 5000);
+        }
+    });
+}

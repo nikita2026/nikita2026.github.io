@@ -286,18 +286,53 @@
     transform: translateY(0);
 }
 
-/* Stagger Animation */
-.stagger-animation > * {
+/* Stagger Animation for Timeline */
+.timeline.stagger-animation > .timeline-item {
     opacity: 0;
     transform: translateY(30px);
-    animation: staggerFadeIn 0.8s ease forwards;
+    transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
-.stagger-animation > *:nth-child(1) { animation-delay: 0.1s; }
-.stagger-animation > *:nth-child(2) { animation-delay: 0.2s; }
-.stagger-animation > *:nth-child(3) { animation-delay: 0.3s; }
-.stagger-animation > *:nth-child(4) { animation-delay: 0.4s; }
-.stagger-animation > *:nth-child(5) { animation-delay: 0.5s; }
+.timeline.stagger-animation.trigger-stagger > .timeline-item:nth-child(1) { 
+    animation: staggerFadeIn 0.8s ease forwards;
+    animation-delay: 0.2s; 
+}
+.timeline.stagger-animation.trigger-stagger > .timeline-item:nth-child(2) { 
+    animation: staggerFadeIn 0.8s ease forwards;
+    animation-delay: 0.5s; 
+}
+.timeline.stagger-animation.trigger-stagger > .timeline-item:nth-child(3) { 
+    animation: staggerFadeIn 0.8s ease forwards;
+    animation-delay: 0.8s; 
+}
+
+/* Stagger Animation for exp-content sections */
+.exp-content.stagger-animation > .exp-section {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.exp-content.stagger-animation.trigger-stagger > .exp-section:nth-child(1) { 
+    animation: staggerFadeIn 0.6s ease forwards;
+    animation-delay: 0.1s; 
+}
+.exp-content.stagger-animation.trigger-stagger > .exp-section:nth-child(2) { 
+    animation: staggerFadeIn 0.6s ease forwards;
+    animation-delay: 0.3s; 
+}
+.exp-content.stagger-animation.trigger-stagger > .exp-section:nth-child(3) { 
+    animation: staggerFadeIn 0.6s ease forwards;
+    animation-delay: 0.5s; 
+}
+
+/* Fallback: Show items if trigger-stagger is not applied within 1 second */
+.timeline.stagger-animation > .timeline-item,
+.exp-content.stagger-animation > .exp-section,
+.exp-content.stagger-animation > .exp-list {
+    animation: staggerFadeIn 0.8s ease forwards;
+    animation-delay: 0.5s;
+}
 
 @keyframes staggerFadeIn {
     to {
@@ -305,3 +340,4 @@
         transform: translateY(0);
     }
 }
+
