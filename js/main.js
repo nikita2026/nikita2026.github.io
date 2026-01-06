@@ -316,61 +316,26 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// Contact Form Handler
+// Contact Form Handler for Google Forms
 const contactForm = document.getElementById('contact-form');
 const formStatus = document.getElementById('form-status');
 
 if (contactForm) {
-    contactForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const formData = {
-            name: document.getElementById('name').value,
-            email: document.getElementById('email').value,
-            subject: document.getElementById('subject').value,
-            message: document.getElementById('message').value
-        };
-        
+    contactForm.addEventListener('submit', (e) => {
         // Show loading state
         const submitBtn = contactForm.querySelector('button[type="submit"]');
         const originalBtnText = submitBtn.innerHTML;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
         submitBtn.disabled = true;
         
-        try {
-            // Use EmailJS or Web3Forms API
-            const response = await fetch('https://api.web3forms.com/submit', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    access_key: '4e8c9d5a-6b2f-4a3c-9d1e-7f8a9b0c1d2e', // Replace with your Web3Forms access key
-                    name: formData.name,
-                    email: formData.email,
-                    subject: formData.subject,
-                    message: formData.message,
-                    to: 'nikitabaxi1102@gmail.com'
-                })
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                formStatus.style.display = 'block';
-                formStatus.style.backgroundColor = '#d4edda';
-                formStatus.style.color = '#155724';
-                formStatus.textContent = 'Thank you! Your message has been sent successfully.';
-                contactForm.reset();
-            } else {
-                throw new Error('Form submission failed');
-            }
-        } catch (error) {
+        // Show success message after form submits to Google
+        setTimeout(() => {
             formStatus.style.display = 'block';
-            formStatus.style.backgroundColor = '#f8d7da';
-            formStatus.style.color = '#721c24';
-            formStatus.textContent = 'Oops! Something went wrong. Please try again or email me directly at nikitabaxi1102@gmail.com';
-        } finally {
+            formStatus.style.backgroundColor = '#d4edda';
+            formStatus.style.color = '#155724';
+            formStatus.textContent = 'Thank you! Your message has been sent successfully.';
+            contactForm.reset();
+            
             submitBtn.innerHTML = originalBtnText;
             submitBtn.disabled = false;
             
@@ -378,6 +343,6 @@ if (contactForm) {
             setTimeout(() => {
                 formStatus.style.display = 'none';
             }, 5000);
-        }
+        }, 1000);
     });
 }
