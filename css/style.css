@@ -1350,6 +1350,7 @@ body {
     }
 
     .article-card, .talk-card, .work-card {
+        background: linear-gradient(135deg, #fff5f8 0%, #f0f9ff 100%);
         padding: 1.25rem;
         margin: 0 10px 1.5rem 10px;
     }
@@ -1488,6 +1489,7 @@ body {
     }
 
     .article-card, .talk-card, .work-card {
+        background: linear-gradient(135deg, #fff5f8 0%, #f0f9ff 100%);
         margin: 0 5px 1rem 5px;
         padding: 1rem;
     }
